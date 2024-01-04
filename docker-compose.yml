@@ -1,0 +1,44 @@
+version: '1.0'
+
+services:
+  drupal:
+    build:
+      dockerfile: Dockerfile
+    container_name: drupal9-server
+    ports:
+      - '80:80'
+    volumes:
+      - './drupal:/var/www/html/'
+      - './custom/themes:/var/www/html/web/themes/custom'
+      - './custom/modules:/var/www/html/web/modules/custom'
+      - './config/sites-enabled/:/etc/apache2/sites-enabled'
+      - './config/sites/sites.php:/var/www/html/web/sites/sites.php'
+      - './volumes/files:/var/www/html/web/sites/default/files'
+      - './volumes/settings.php:/var/www/html/web/sites/default/settings.php'
+    links:
+      - mariadb:mariadb
+    networks:
+      drupal-network:
+        aliases: 
+          - drupal
+
+  mariadb:
+    image: mariadb:10.9.1-rc
+    container_name: mariadb-server
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    volumes: 
+      - ./volumes/init:/docker-entrypoint-initdb.d
+      - ./volumes/mariadb_volume:/var/lib/mysql
+    networks:
+      drupal-network:
+        aliases:
+          - mariadb
+
+networks:
+  drupal-network:
+    name: drupal-net
+    driver: bridge
+    ipam:
+      driver: default
+
