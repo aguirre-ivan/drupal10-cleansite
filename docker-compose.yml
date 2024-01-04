@@ -4,7 +4,7 @@ services:
   drupal:
     build:
       dockerfile: Dockerfile
-    container_name: drupal9-server
+    container_name: drupal10-server
     ports:
       - '80:80'
     volumes:
